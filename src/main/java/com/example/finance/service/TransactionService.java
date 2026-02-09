@@ -1,4 +1,5 @@
 package com.example.finance.service;
+
 import com.example.finance.dto.transaction.TransactionRequest;
 import com.example.finance.dto.transaction.TransactionResponse;
 import com.example.finance.entity.Category;
@@ -16,12 +17,14 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
+
 @Service
 @Transactional
 public class TransactionService {
   private final TransactionRepository transactionRepository;
   private final CategoryRepository categoryRepository;
   private final UserRepository userRepository;
+
   public TransactionService(TransactionRepository transactionRepository,
       CategoryRepository categoryRepository,
       UserRepository userRepository) {
@@ -29,6 +32,7 @@ public class TransactionService {
     this.categoryRepository = categoryRepository;
     this.userRepository = userRepository;
   }
+
   @Transactional(readOnly = true)
   public List<TransactionResponse> getAllTransactions(LocalDate startDate, LocalDate endDate,
       String category, TransactionType type) {
@@ -51,6 +55,7 @@ public class TransactionService {
         .map(this::mapToResponse)
         .collect(Collectors.toList());
   }
+
   @Transactional(readOnly = true)
   public TransactionResponse getTransactionById(Long id) {
     User currentUser = getCurrentUser();
@@ -58,6 +63,7 @@ public class TransactionService {
         .orElseThrow(() -> new ResourceNotFoundException("Transaction not found"));
     return mapToResponse(transaction);
   }
+
   public TransactionResponse createTransaction(TransactionRequest request) {
     User currentUser = getCurrentUser();
 
@@ -72,6 +78,7 @@ public class TransactionService {
     Transaction savedTransaction = transactionRepository.save(transaction);
     return mapToResponse(savedTransaction);
   }
+
   public TransactionResponse updateTransaction(Long id, TransactionRequest request) {
     User currentUser = getCurrentUser();
     Transaction transaction = transactionRepository.findByIdAndUser(id, currentUser)
@@ -89,6 +96,7 @@ public class TransactionService {
     Transaction updatedTransaction = transactionRepository.save(transaction);
     return mapToResponse(updatedTransaction);
   }
+
   public TransactionResponse deleteTransaction(Long id) {
     User currentUser = getCurrentUser();
     Transaction transaction = transactionRepository.findByIdAndUser(id, currentUser)
@@ -97,6 +105,7 @@ public class TransactionService {
     transactionRepository.delete(transaction);
     return response;
   }
+
   private Category validateCategoryAccess(String categoryName, User user) {
 
     Category category = categoryRepository.findByNameAndUser(categoryName, user)
@@ -104,11 +113,13 @@ public class TransactionService {
             .orElseThrow(() -> new ResourceNotFoundException("Category not found")));
     return category;
   }
+
   private User getCurrentUser() {
     String username = SecurityUtils.getCurrentUsername();
     return userRepository.findByUsername(username)
         .orElseThrow(() -> new ResourceNotFoundException("User not found"));
   }
+
   private TransactionResponse mapToResponse(Transaction transaction) {
     return new TransactionResponse(
         transaction.getId(),

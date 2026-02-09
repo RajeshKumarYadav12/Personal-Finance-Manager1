@@ -1,4 +1,5 @@
 package com.example.finance.service;
+
 import com.example.finance.dto.goal.GoalRequest;
 import com.example.finance.dto.goal.GoalResponse;
 import com.example.finance.entity.SavingsGoal;
@@ -16,12 +17,14 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
+
 @Service
 @Transactional
 public class GoalService {
   private final GoalRepository goalRepository;
   private final TransactionRepository transactionRepository;
   private final UserRepository userRepository;
+
   public GoalService(GoalRepository goalRepository,
       TransactionRepository transactionRepository,
       UserRepository userRepository) {
@@ -29,6 +32,7 @@ public class GoalService {
     this.transactionRepository = transactionRepository;
     this.userRepository = userRepository;
   }
+
   @Transactional(readOnly = true)
   public List<GoalResponse> getAllGoals() {
     User currentUser = getCurrentUser();
@@ -37,6 +41,7 @@ public class GoalService {
         .map(goal -> mapToResponse(goal, currentUser))
         .collect(Collectors.toList());
   }
+
   @Transactional(readOnly = true)
   public GoalResponse getGoalById(Long id) {
     User currentUser = getCurrentUser();
@@ -44,6 +49,7 @@ public class GoalService {
         .orElseThrow(() -> new ResourceNotFoundException("Savings goal not found"));
     return mapToResponse(goal, currentUser);
   }
+
   public GoalResponse createGoal(GoalRequest request) {
     User currentUser = getCurrentUser();
 
@@ -59,6 +65,7 @@ public class GoalService {
     SavingsGoal savedGoal = goalRepository.save(goal);
     return mapToResponse(savedGoal, currentUser);
   }
+
   public GoalResponse updateGoal(Long id, GoalRequest request) {
     User currentUser = getCurrentUser();
     SavingsGoal goal = goalRepository.findByIdAndUser(id, currentUser)
@@ -74,6 +81,7 @@ public class GoalService {
     SavingsGoal updatedGoal = goalRepository.save(goal);
     return mapToResponse(updatedGoal, currentUser);
   }
+
   public GoalResponse deleteGoal(Long id) {
     User currentUser = getCurrentUser();
     SavingsGoal goal = goalRepository.findByIdAndUser(id, currentUser)
@@ -82,6 +90,7 @@ public class GoalService {
     goalRepository.delete(goal);
     return response;
   }
+
   private BigDecimal calculateProgress(SavingsGoal goal, User user) {
     LocalDate endDate = LocalDate.now().isBefore(goal.getTargetDate())
         ? LocalDate.now()
@@ -92,11 +101,13 @@ public class GoalService {
         user, goal.getStartDate(), endDate);
     return totalIncome.subtract(totalExpenses);
   }
+
   private User getCurrentUser() {
     String username = SecurityUtils.getCurrentUsername();
     return userRepository.findByUsername(username)
         .orElseThrow(() -> new ResourceNotFoundException("User not found"));
   }
+
   private GoalResponse mapToResponse(SavingsGoal goal, User user) {
     BigDecimal currentProgress = calculateProgress(goal, user);
     BigDecimal remainingAmount = goal.getTargetAmount().subtract(currentProgress);

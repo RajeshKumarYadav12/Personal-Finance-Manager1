@@ -1,4 +1,8 @@
 package com.example.finance.dto.auth;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class AuthResponse {
   private String message;
   private String username;
