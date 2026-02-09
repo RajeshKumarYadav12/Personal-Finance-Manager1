@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: personal-finance-manager
+    runtime: python3
+    plan: free
+    buildCommand: |
+      curl -s "https://get.sdkman.io" | bash
+      source "$HOME/.sdkman/bin/sdkman-init.sh"
+      sdk install java 17.0.9-tem
+      chmod +x mvnw
+      ./mvnw clean package -DskipTests
+    startCommand: java -Dserver.port=$PORT -jar target/finance-1.0.0.jar
