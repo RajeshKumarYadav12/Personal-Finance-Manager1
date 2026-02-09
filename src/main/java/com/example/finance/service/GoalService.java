@@ -74,11 +74,13 @@ public class GoalService {
     SavingsGoal updatedGoal = goalRepository.save(goal);
     return mapToResponse(updatedGoal, currentUser);
   }
-  public void deleteGoal(Long id) {
+  public GoalResponse deleteGoal(Long id) {
     User currentUser = getCurrentUser();
     SavingsGoal goal = goalRepository.findByIdAndUser(id, currentUser)
         .orElseThrow(() -> new ResourceNotFoundException("Savings goal not found"));
+    GoalResponse response = mapToResponse(goal, currentUser);
     goalRepository.delete(goal);
+    return response;
   }
   private BigDecimal calculateProgress(SavingsGoal goal, User user) {
     LocalDate endDate = LocalDate.now().isBefore(goal.getTargetDate())

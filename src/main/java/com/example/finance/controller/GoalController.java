@@ -6,7 +6,9 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 @RestController
 @RequestMapping("/api/goals")
 public class GoalController {
@@ -37,8 +39,13 @@ public class GoalController {
     return ResponseEntity.ok(response);
   }
   @DeleteMapping("/{id}")
-  public ResponseEntity<Void> deleteGoal(@PathVariable Long id) {
-    goalService.deleteGoal(id);
-    return ResponseEntity.noContent().build();
+  public ResponseEntity<Map<String, Object>> deleteGoal(@PathVariable Long id) {
+    GoalResponse goal = goalService.deleteGoal(id);
+    Map<String, Object> response = new HashMap<>();
+    response.put("message", "Savings goal deleted successfully");
+    response.put("id", goal.getId());
+    response.put("goalName", goal.getGoalName());
+    response.put("targetAmount", goal.getTargetAmount());
+    return ResponseEntity.ok(response);
   }
 }

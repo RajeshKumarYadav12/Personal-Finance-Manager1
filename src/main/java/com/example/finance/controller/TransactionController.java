@@ -9,7 +9,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 @RestController
 @RequestMapping("/api/transactions")
 public class TransactionController {
@@ -46,8 +48,13 @@ public class TransactionController {
     return ResponseEntity.ok(response);
   }
   @DeleteMapping("/{id}")
-  public ResponseEntity<Void> deleteTransaction(@PathVariable Long id) {
-    transactionService.deleteTransaction(id);
-    return ResponseEntity.noContent().build();
+  public ResponseEntity<Map<String, Object>> deleteTransaction(@PathVariable Long id) {
+    TransactionResponse transaction = transactionService.deleteTransaction(id);
+    Map<String, Object> response = new HashMap<>();
+    response.put("message", "Transaction deleted successfully");
+    response.put("id", transaction.getId());
+    response.put("description", transaction.getDescription());
+    response.put("amount", transaction.getAmount());
+    return ResponseEntity.ok(response);
   }
 }

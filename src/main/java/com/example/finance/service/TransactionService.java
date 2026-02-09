@@ -89,11 +89,13 @@ public class TransactionService {
     Transaction updatedTransaction = transactionRepository.save(transaction);
     return mapToResponse(updatedTransaction);
   }
-  public void deleteTransaction(Long id) {
+  public TransactionResponse deleteTransaction(Long id) {
     User currentUser = getCurrentUser();
     Transaction transaction = transactionRepository.findByIdAndUser(id, currentUser)
         .orElseThrow(() -> new ResourceNotFoundException("Transaction not found"));
+    TransactionResponse response = mapToResponse(transaction);
     transactionRepository.delete(transaction);
+    return response;
   }
   private Category validateCategoryAccess(String categoryName, User user) {
 
